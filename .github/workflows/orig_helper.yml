@@ -10,6 +10,7 @@ jobs:
   rerun_orig:
     runs-on: ubuntu-latest
     if: ${{ github.run_attempt < 3 }}
+    permissions: write-all
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

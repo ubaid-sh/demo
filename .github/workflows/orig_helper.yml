@@ -15,20 +15,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Get Previous workflow info
-        id: get_workflow_info
+      - name: Get Previous attempt count
+        id: get_attempt_cnt
         run: |
-          workflow_info=$( \
+          no_of_attempts=$( \
             curl -s \
               -H 'Accept: application/vnd.github+json' \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-              https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }})
+              https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }} | jq '.run_attempt')
 
-          echo "workflow_info: $workflow_info"
-          echo "workflow_info=$workflow_info" >> $GITHUB_OUTPUT
+          echo "no_of_attempts: $no_of_attempts"
+          echo "no_of_attempts=$no_of_attempts" >> $GITHUB_OUTPUT
 
       - name: Rerun orig.yml
-        if: ${{ fromJSON(steps.get_workflow_info.outputs.workflow_info).run_attempt < 3 }}
+        if: ${{ fromJSON(steps.get_attempt_cnt.outputs.no_of_attempts) < 3 }}
         run: |
           echo "Rerunning ..."
           curl -L \

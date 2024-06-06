@@ -25,8 +25,10 @@ jobs:
               https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.event.workflow_run.id }} | jq '.run_attempt')" \
             >> $GITHUB_ENV
 
+          echo "no_of_attempts: $no_of_attempts"
+
       - name: Rerun orig.yml
-        if: ${{ steps.get_attempt_cnt.outputs.no_of_attempts }} < 3
+        if: ${{ steps.get_attempt_cnt.outputs.no_of_attempts < 3 }}
         run: |
           echo "Rerunning ..."
           curl -L \

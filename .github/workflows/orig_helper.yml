@@ -1,0 +1,24 @@
+name: Rerun orig.yml
+
+on:
+  workflow_run:
+    workflows: [Demo]
+    types:
+      - completed
+
+jobs:
+  rerun_orig:
+    runs-on: ubuntu-latest
+    if: ${{ github.run_attempt < 3 }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Rerun orig.yml
+        run: |
+          echo "Rerunning ..."
+
+      - name: Rerun Lint Alerts
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Demo

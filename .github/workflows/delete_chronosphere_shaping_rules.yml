@@ -7,12 +7,12 @@ on:
         description: Chronosphere rollup rules to delete separated by ','
         type: string
         default: ''
-        required: true
+        required: false
       drop_rules_delete_list:
         description: Chronosphere drop rules to delete separated by ','
         type: string
         default: ''
-        required: true
+        required: false
 
 env:
   SOURCE: ${{ github.workspace }}

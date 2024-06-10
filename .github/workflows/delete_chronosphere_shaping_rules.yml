@@ -25,8 +25,7 @@ jobs:
   delete_shaping_rules:
     name: Delete shaping rules
     runs-on:
-      - self-hosted
-      - ci-prod-bzl-amd64
+      - ubuntu-latest
     env:
       CHRONOSPHERE_ORG_NAME: abnormal
       CHRONOSPHERE_API_TOKEN: ${{ secrets.CHRONOSPHERE_TOKEN }}

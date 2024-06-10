@@ -2,17 +2,17 @@
 name: Delete Chronosphere Shaping Rules
 on:
   workflow_dispatch:
-inputs:
-  rollup_rules_delete_list:
-    description: Chronosphere rollup rules to delete separated by ','
-    type: string
-    default: ''
-    required: true
-  drop_rules_delete_list:
-    description: Chronosphere drop rules to delete separated by ','
-    type: string
-    default: ''
-    required: true
+    inputs:
+      rollup_rules_delete_list:
+        description: Chronosphere rollup rules to delete separated by ','
+        type: string
+        default: ''
+        required: true
+      drop_rules_delete_list:
+        description: Chronosphere drop rules to delete separated by ','
+        type: string
+        default: ''
+        required: true
 
 env:
   SOURCE: ${{ github.workspace }}

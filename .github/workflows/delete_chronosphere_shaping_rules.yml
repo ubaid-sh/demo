@@ -35,4 +35,4 @@ jobs:
 
       - name: Echo running command
         run: |
-          echo "bazel run --config=ci //projects/sre/chronosphere-tooling -- delete_shaping_rules --rollup-rules-delete-list ${{ inputs.rollup_rules_delete_list }} --drop-rules-delete-list ${{ inputs.drop_rules_delete_list }}"
+          echo 'bazel run --config=ci //projects/sre/chronosphere-tooling -- delete_shaping_rules --rollup-rules-delete-list "${{ inputs.rollup_rules_delete_list }}" --drop-rules-delete-list "${{ inputs.drop_rules_delete_list }}"'

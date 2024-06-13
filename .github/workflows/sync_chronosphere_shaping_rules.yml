@@ -108,10 +108,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4.1.0
 
-      - name: Run bazel setup
-        run: |
-          # Boot a Bazel server as needed without runner process tracking
-          RUNNER_TRACKING_ID="" && bazel info
+      # - name: Run bazel setup
+      #   run: |
+      #     # Boot a Bazel server as needed without runner process tracking
+      #     RUNNER_TRACKING_ID="" && bazel info
 
       - name: Run delete shaping rules
         run: |

@@ -35,8 +35,7 @@ jobs:
     name: Diff Rollup rules
     if: ${{ github.event_name == 'schedule' }}
     runs-on:
-      - self-hosted
-      - ci-prod-bzl-amd64
+      - ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.0
@@ -69,8 +68,7 @@ jobs:
     name: Diff Drop rules
     if: ${{ github.event_name == 'schedule' }}
     runs-on:
-      - self-hosted
-      - ci-prod-bzl-amd64
+      - ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.0
@@ -102,8 +100,7 @@ jobs:
     name: Delete shaping rules
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on:
-      - self-hosted
-      - ci-prod-bzl-amd64
+      - ubuntu-latest
     env:
       CHRONOSPHERE_ORG_NAME: abnormal
       CHRONOSPHERE_API_TOKEN: ${{ secrets.CHRONOSPHERE_TOKEN }}

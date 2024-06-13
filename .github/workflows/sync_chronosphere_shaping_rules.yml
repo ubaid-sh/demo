@@ -1,0 +1,121 @@
+---
+name: Sync Chronosphere Shaping Rules
+on:
+  workflow_dispatch:
+    inputs:
+      rollup_rules_delete_list:
+        description: Chronosphere rollup rules (slug) to delete separated by ','
+        type: string
+        default: ''
+        required: false
+      drop_rules_delete_list:
+        description: Chronosphere drop rules (slug) to delete separated by ','
+        type: string
+        default: ''
+        required: false
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/sync_chronosphere_shaping_rules.yml'
+      - 'ops/chronosphere/prod/config/**'
+
+  schedule:
+    - cron: '30 4 * * *' # daily at 10am IST
+
+env:
+  SOURCE: ${{ github.workspace }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  diff_rollup_rules:
+    name: Diff Rollup rules
+    if: ${{ github.event_name == 'schedule' }}
+    runs-on:
+      - self-hosted
+      - ci-prod-bzl-amd64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.0
+
+      - name: Run bazel setup
+        run: |
+          # Boot a Bazel server as needed without runner process tracking
+          RUNNER_TRACKING_ID="" && bazel info
+
+      - name: Run diff rollup rules
+        id: diff_rollup_rules
+        run: |
+          bazel run //projects/sre/chronomgr -- diff-rollup-rules
+          echo "contents=`cat ops/chronosphere/prod/config/diff_rollup_rules.json`" >> "$GITHUB_OUTPUT"
+        env:
+          CHRONOSPHERE_ORG_NAME: abnormal
+          CHRONOSPHERE_API_TOKEN: ${{ secrets.CHRONOSPHERE_TOKEN }}
+
+      - name: Notify on Slack
+        if: ${{ fromJSON(steps.diff_rollup_rules.outputs.contents).notify_slack }}
+        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117
+        with:
+          channel-id: o11y-alerts
+          slack-message: "${{ fromJSON(steps.diff_rollup_rules.outputs.contents).message }} \n Workflow: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} | #${{ github.run_id }}>"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_NOTIFICATIONS_BOT_TOKEN }}
+
+
+  diff_drop_rules:
+    name: Diff Drop rules
+    if: ${{ github.event_name == 'schedule' }}
+    runs-on:
+      - self-hosted
+      - ci-prod-bzl-amd64
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.0
+
+      - name: Run bazel setup
+        run: |
+          # Boot a Bazel server as needed without runner process tracking
+          RUNNER_TRACKING_ID="" && bazel info
+
+      - name: Run diff drop rules
+        id: diff_drop_rules
+        run: |
+          bazel run //projects/sre/chronomgr -- diff-drop-rules
+          echo "contents=`cat ops/chronosphere/prod/config/diff_drop_rules.json`" >> "$GITHUB_OUTPUT"
+        env:
+          CHRONOSPHERE_ORG_NAME: abnormal
+          CHRONOSPHERE_API_TOKEN: ${{ secrets.CHRONOSPHERE_TOKEN }}
+
+      - name: Notify on Slack
+        if: ${{ fromJSON(steps.diff_drop_rules.outputs.contents).notify_slack }}
+        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117
+        with:
+          channel-id: o11y-alerts
+          slack-message: "${{ fromJSON(steps.diff_drop_rules.outputs.contents).message }} \n Workflow: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }} | #${{ github.run_id }}>"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_NOTIFICATIONS_BOT_TOKEN }}
+
+  delete_shaping_rules:
+    name: Delete shaping rules
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on:
+      - self-hosted
+      - ci-prod-bzl-amd64
+    env:
+      CHRONOSPHERE_ORG_NAME: abnormal
+      CHRONOSPHERE_API_TOKEN: ${{ secrets.CHRONOSPHERE_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.0
+
+      - name: Run bazel setup
+        run: |
+          # Boot a Bazel server as needed without runner process tracking
+          RUNNER_TRACKING_ID="" && bazel info
+
+      - name: Run delete shaping rules
+        run: |
+          echo 'bazel run //projects/sre/chronomgr -- delete-shaping-rules --rollup-rules-delete-list "${{ inputs.rollup_rules_delete_list }}" --drop-rules-delete-list "${{ inputs.drop_rules_delete_list }}"'
